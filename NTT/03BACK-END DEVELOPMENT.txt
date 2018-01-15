@@ -1,0 +1,224 @@
+This section describes the acoustic and language models that we built for CHiME-3 with emphasis on a novel technique and key differences from the challenge baseline system.
+このセクションでは、新規技術とチャレンジベースラインシステムとの主な違いを重視してCHiME-3のために構築した音響モデルと言語モデルについて説明します。
+
+In all the experiments reported in this paper, decoding was performed using fully composed tri-gram weighted finite state transducers (WFSTs).
+この論文で報告されたすべての実験では、完全に構成されたトリグラム加重有限状態トランスデューサ（WFST）を使用してデコードが実行されました。
+
+For RNN-LM decoding, tri-gram hypotheses were rescored using an RNN-LM on the fly during decoding, which allows this type of language model to be used in a one-pass decoding scenario (see [12] for the algorithmic details).
+RNN-LMデコードの場合、デコード中にオンザフライでRNN-LMを使用してトリグラム仮説を再考し、このタイプの言語モデルをワンパスデコードシナリオで使用できるようにしました(アルゴリズムの詳細は[12]を参照してください)
+
+The language model scale was fixed at 14.
+言語モデルのスケールは14に固定されました。
+
+In this section, although the figure of merit of the CHiME-3 challenge is a WER for the real part of the test data, we focus on the average performance over the simulated and real data as the training set is largely composed of simulated utterances.
+このセクションでは、CHiME-3チャレンジの性能指数はテストデータの実際の部分のWERですが、トレーニングセットは主にシミュレートされた発声で構成されているため、シミュレートされたデータと実際のデータの平均パフォーマンスに焦点を当てています。
+
+
+3.1.Acoustic model training
+音響モデル学習
+
+We used a DNN-hiddenMarkovmodel (HMM) hybrid approach [14, 15] for acoustic modelling.
+我々は音響モデリングにDNN-hiddenMarkovmodel（HMM）ハイブリッド手法を用いた[14,15]。
+
+Our acoustic models were built following a standard recipe [15].
+私たちの音響モデルは標準的なレシピ[15]に従って作成されました。
+
+Our Gaussian mixture model (GMM)- HMM acoustic models were trained with a maximum likelihood (ML) approach and used to generate state alignments.
+私たちのガウス混合モデル（GMM） - HMM音響モデルは、最尤法（maximum likelihood：ML）アプローチで訓練され、状態アライメントを生成するために使用されました。
+
+Input features for the GMM-HMMs consisted of 13 mean-normalised PLP coefficients and their delta and delta-delta parameters.
+GMM-HMMの入力フィーチャは、13個の平均正規化PLP係数とそれらのデルタおよびデルタデルタパラメータから構成されています。
+
+These features were extracted with a 25-msec sliding window with a 10-msec shift.
+これらの特徴は、10ミリ秒のシフトを伴う25ミリ秒のスライディングウィンドウで抽出された。
+
+All the DNN-HMM systems built in this work were based on sigmoid units and used 11 consecutive speech frames as inputs, where each frame was represented by 40-dimensional log mel-filter bank features plus their delta and delta-delta parameters.
+この作業で構築されたすべてのDNN-HMMシステムはシグモイドユニットに基づいており、各フレームは40次元のログメルフィルタバンクの特徴とそれらのデルタおよびデルタデルタパラメータによって表された11の連続音声フレームを入力として使用した。
+
+The DNNs were trained (or fine-tuned) with mini-batch stochastic gradient descent (SGD) to minimise a cross entropy criterion.
+DNNは、クロスエントロピー基準を最小にするために、ミニバッチの確率的勾配降下（SGD）を用いて訓練された（または微調整された）。
+
+Each DNN layer was pre-trained for one epoch prior to fine-tuning unless otherwise noted.
+各DNN層は、特に明記しない限り、微調整の前に1エポック前に事前訓練を受けた。
+
+
+In the CHiME-3 task, a difficulty associated with acoustic modelling arises from the fact that the training set is too small to learn the feature variations caused by environmental noise.
+CHiME-3課題では、音響モデルに関連する困難は、訓練セットが環境雑音によって生じる特徴変動を知るには小さすぎるという事実から生じる。
+
+One way of coping with this issue is to remove noise-associated feature variations from both training and test data by performing speech enhancement in the front-end.
+この問題に対処する1つの方法は、フロントエンドで音声強調を実行することによって、トレーニングデータとテストデータの両方からノイズに関連するフィーチャバリエーションを削除することです。
+
+Although this approach, which is often called (feature-based) noise adaptive training, should improve recognition performance, it is cumbersome when multiple front-ends are used because acoustic models need to be trained for each front-end.
+多くの場合、（フィーチャベースの）雑音適応訓練と呼ばれるこのアプローチは認識性能を向上させるはずですが、フロントエンドごとに音響モデルを訓練する必要があるため、複数のフロントエンドを使用すると面倒です。
+
+
+An alternative approach adopted in this work is to train an acoustic model using audio from multiple channels, i.e., multi-microphone training.
+この研究で採用された別のアプローチは、複数チャネルのオーディオ、すなわちマルチマイクロホン訓練を用いて音響モデルを訓練することである。
+
+With this approach, the acoustic model is exposed to larger feature variations during training to make it more tolerant to environmental variability.
+このアプローチでは、音響モデルは、環境変動に対してより耐性を持たせるために、トレーニング中により大きな特徴変動にさらされる。
+
+Table 1 compares models trained on three different data sets in terms of word error rates (WERs).
+表1は、単語誤り率（WER）に関して3つの異なるデータセットで訓練されたモデルを比較したものである。
+
+Here, we used DNNs consisting of four hidden layers each with 2048 units.
+ここでは、それぞれ2048個のユニットを持つ4つの隠れ層からなるDNNを使用しました。
+
+The results show that the multi-microphone training approach led to significant performance improvement.
+この結果は、マルチマイクロホンの訓練手法がパフォーマンスを大幅に向上させることを示しています。
+
+The benefit of using simulated data for training is also clearly seen.
+シミュレートされたデータをトレーニングに使用することの利点も明確に分かります。
+
+All the acoustic models used in the following experiments were trained on 108 hours of audio taken from all six microphones.
+次の実験で使用されたすべての音響モデルは、6つのマイクすべてから取得した108時間のオーディオで訓練されました。
+
+Note that the effect of multi-microphone training was examined previously in [16] for meeting transcription.
+マルチマイクロホン訓練の効果は、転写を満たすために[16]で以前に調べられたことに注意されたい。
+
+In this paper, we further perform speech enhancement at the recognition stage and decode the enhanced speech using models trained with unprocessed noisy data.
+本論文では、認識段階で音声強調を行い、未処理の雑音データを訓練したモデルを用いて拡張音声を解読する。
+
+
+3.2.“Network-in-network” convolutional neural networks
+「ネットワーク・イン・ネットワーク」畳み込みニューラル・ネットワーク
+
+A hallmark of our acoustic model is the use of a deep CNN based on NIN.
+私たちの音響モデルの特徴は、NINに基づく深いCNNの使用です。
+
+The NIN concept was recently proposed in the image classification area [7, 8].
+NINの概念は、最近、画像分類領域において提案された[7,8]。
+
+The main difference between an NIN-CNN and a conventional CNN can be briefly explained as follows.
+NIN-CNNと従来のCNNとの主な違いは、以下のように簡単に説明することができる。
+
+The central idea behind the CNN, either with the conventional structure or with the NIN, is to transform input data, organised as a set of time-frequency feature maps, with a set of non-linear local filters.
+CNNの背後にある中心的なアイデアは、従来の構造またはNINのいずれかで、一連の非線形ローカルフィルタで時間 - 周波数特性マップのセットとして構成された入力データを変換することです。
+
+This operation is repeated multiple times, which allows local information to be gradually integrated.
+この操作は複数回繰り返され、ローカル情報を徐々に統合することができます。
+
+In a conventional CNN, a convolution layer computes each unit activation on an output feature map by applying a linear filter on each local patch of the preceding layer and obtaining the filter output through a non-linear (sigmoid in this work) activation function, σ(), on a per-unit basis.
+従来のCNNでは、畳み込み層は、先行する層の各局所パッチに線形フィルタを適用し、非線形（この作品ではS字状）活性化関数σを介してフィルタ出力を得ることによって、出力特性マップ上の各ユニット活性化を計算する これは、ユニットごとに行われます。
+
+Therefore, when yf,t,k denotes a unit activation at frequency f and time t on the kth output feature map, it can be computed as follows:
+したがって、yf、t、kがk番目の出力特徴マップ上の周波数fと時間tでの単位活性化を表すとき、それは以下のように計算することができる。
+
+式(1)
+
+where xf,t denotes an input local patch centred around (f, t), and wk and bk, respectively, denote the filter and bias associated with the kth output feature map.
+ここで、x f、tは、（f、t）を中心とする入力局所パッチを示し、w kおよびb kは、それぞれk番目の出力特徴マップに関連するフィルタおよびバイアスを示す。
+
+
+While the conventional CNN applies a unit-wise non-linear activation, the NIN-CNN uses a cross-feature map multi-layer perceptron (MLP) to capture more complex non-linear structures.
+従来のCNNは、ユニット単位の非線形活性化を適用するが、NIN-CNNは、より複雑な非線形構造を捕捉するために、クロス・フィーチャ・マップのマルチレイヤ・パーセプトロン（MLP）を使用する。
+
+Figure 1 contrasts the NIN-CNN structure with that of the conventional CNN.
+図1はNIN-CNN構造と従来のCNN構造を対比しています。
+
+When the cross-feature map MLP has one hidden layer (as shown in Fig.1), Equation (1) is replaced with the following set of equations:
+クロス特徴マップMLPが（図1に示すように）1つの隠れ層を有するとき、式（1）は以下の式のセットに置き換えられる。
+
+式(2)
+
+where ~yf,t is the vector of ~yf,t,1, … , ~yf,t,K with K representing the number of output feature maps.
+~yf、tは~yf、t、1、…、~yf、t、Kのベクトルであり、Kは出力特徴マップの数を表す。
+
+Since each cross-feature map MLP layer is equivalent to a convolution layer with a 1×1 filter [7], the NIN-CNN can be readily implemented by interleaving 1 × 1 convolution layers with ordinary convolution layers that use wider filters.
+各クロス・フィーチャ・マップMLP層は1×1フィルタを備えた畳み込み層と同等であるため[7]、NIN-CNNは、より広いフィルタを使用する通常の畳み込み層と1×1の畳み込み層をインタリーブすることによって容易に実現できる。
+
+
+Table 2 shows the NIN-CNN configuration that we used for our systems.
+表2は、私たちのシステムで使用したNIN-CNN構成を示しています。
+
+It has five convolution layers, two pooling layers, and three fully connected layers between the input and output (or softmax) layers.
+入力と出力（またはsoftmax）レイヤの間に、5つの畳み込みレイヤー、2つのプールレイヤー、3つの完全に接続されたレイヤーがあります。
+
+To the best of our knowledge, our work is the first application of such a deep CNN to speech recognition.
+われわれが知る限りでは、このようなCNNを音声認識に初めて適用したのです。
+
+
+We carried out experiments to compare different neural network architectures.
+異なるニューラルネットワークアーキテクチャを比較する実験を行った。
+
+For fully connected DNNs, we considered two configurations: one with four hidden layers and the other with ten hidden layers, each with 2048 units.
+完全に接続されたDNNについては、4つの隠れ層を有するものと、10の隠れ層を有するものとの2つの構成が考えられ、それぞれが2048個のユニットを有する。
+
+The latter was initialised by stacking restricted Boltzmann machines (RBMs) [17], each of which was thoroughly pre-trained with the contrastive divergence algorithm [18] for many epochs (50 for the first layer and 15 for the the remaining layers).
+後者は、制限されたボルツマン装置（RBM）[17]を積み重ねることによって初期化された。各装置は、多くのエポック（第1層の場合は50、残りの層の場合は15）に対してコントラスト発散アルゴリズム[18]で完全に事前トレーニングされた。
+
+For conventional CNNs [19, 20], we experimented with two configurations: one with two convolution layers and one with three convolution layers.
+従来のCNNs [19,20]では、2つのコンボリューションレイヤーと3つのコンボリューションレイヤーの2つの構成で実験を行った。
+
+If we use the notation shown in Table 2, these CNNs can be written as ‘conv1a-pool1-conv2a-pool2-fc1- fc2-fc3-softmax’ and ‘conv1a-pool1-conv2a-pool2-conv3-fc1-fc2- fc3-softmax’, respectively.
+表2に示す表記を使用すると、これらのCNNは「conv1a-pool1-conv2a-pool2-fc1-fc2-fc3-softmax」と「conv1a-pool1-conv2a-pool2-conv3-fc1-fc2- -softmax 'とする。
+
+The latter CNN produced the lowest development WER (11.52%) of the CNN configurations we tested in our preliminary experiments.
+後者のCNNは、本発明者らの予備実験で試験したCNN構成の最も低いWER（11.52％）を生成した。
+
+
+The experimental results are shown in Table 3.
+実験結果を表3に示す。
+
+We can see that the NIN-CNN yielded significant performance gains compared with all the other models we considered.
+NIN-CNNは、我々が考慮した他のすべてのモデルと比較して、大幅な性能向上をもたらしたことがわかります。
+
+The relative gains were 9.82% and 4.04% compared with the best-performing DNN and CNN, respectively, for the development set.
+開発セットのDNNとCNNのそれぞれに比較して、相対利得は9.82％と4.04％でした。
+
+The respective gains were 12.04% and 3.87% for the evaluation set.
+それぞれの利得は、評価セットの12.04％および3.87％であった。
+
+These results show the promise of the NIN approach.
+これらの結果は、NINアプローチの約束を示しています。
+
+Future investigation is expected to fully explore the merit of this approach.
+今後の調査では、このアプローチのメリットを十分に探ることが期待されます。
+
+3.3.Language model development
+言語モデル開発
+
+In addition to the official 5K-word vocabulary tri-gram language model, we used an RNN-LM, which has been proven to improve recognition performance in many tasks [21, 22].
+正式な5K語の語彙トライグラム言語モデルに加えて、多くのタスクで認識性能を向上させることが証明されているRNN-LMを使用した[21]、[22]。
+
+
+Our RNN-LM was built from the official language model training data, consisting of 1.6M sentences including 37M words with a 165K-word vocabulary.
+私たちのRNN-LMは、正式な言語モデル訓練データから構築されました.1600万センチの文章と、37万語と165,000語のボキャブラリーから構成されています。
+
+We used a subset of the complete training data set for RNN-LM training because the complete set contains a lot of words that fall outside the 5K-word vocabulary.
+完全セットには、5000語の語彙の外にある多くの単語が含まれているため、RNN-LMトレーニングのための完全なトレーニングデータセットのサブセットを使用しました。
+
+Sentences used for training were selected as follows.
+訓練に使用された文は、以下のように選択された。
+
+First, we replaced words that were not included in the 5K-word vocabulary with an out-ofvocabulary (OOV) word symbol.
+まず、5000単語の語彙に含まれていない単語をOOV（Out-ofvocabulary）の単語シンボルに置き換えました。
+
+Then, we selected sentences with OOV word rates below 10%.
+次に、OOVの単語率が10％未満の文章を選択した。
+
+This left us with a subset of the training data comprising 0.8M sentences including 19M words with an OOV word rate of 4.36%.
+これは、4.36％のOOVワードレートを有する19Mワードを含む0.8M文を含むトレーニングデータのサブセットを残した。
+
+By using this subset, we trained a word class-based RNN-LM with 10 classes and a 500-unit recurrent hidden layer with the RNNLM toolkit [23].
+このサブセットを使用して、RNNLMツールキットを使用して、10クラスおよび500ユニットの反復隠しレイヤーを備えた単語クラスベースのRNN-LMを訓練した[23]。
+
+The use of the RNN-LM improved the development error rate from 10.93% to 8.62% and the evaluation error rate from 15.64% to 12.89%, where the RNN-LM and tri-gram scores were interpolated at a fifty-fifty rate.
+RNN-LMの使用により、開発誤差率が10.93％から8.62％に改善され、評価誤差率が15.64％から12.89％に改善され、RNN-LMおよびtri-gramスコアが50％の割合で補間された。
+
+
+3.4.Back-end development summary
+バックエンド開発の要約
+
+In Section 3, we have introduced a deep CNN based on NIN, which improved the recognition performance compared with conventional CNNs and fully connected DNNs.
+3章では、従来のCNNや完全に接続されたDNNと比較して認識性能を向上させたNINに基づく深いCNNを紹介した。
+
+We also showed that multimicrophone training and RNN language modelling work well for the CHiME-3 task.
+また、マルチマイクロホンのトレーニングとRNN言語モデリングがCHiME-3タスクでうまくいくことを示しました。
+
+The experiments described in the following sections used the NIN-CNN acoustic model and the RNN language model developed as described above.
+翻訳
+
+The experiments described in the following sections used the NIN-CNN acoustic model and the RNN language model developed as described above.
+
+以下のセクションで説明する実験は、上述のように開発されたNIN-CNN音響モデルとRNN言語モデルを使用しました。

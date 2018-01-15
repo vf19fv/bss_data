@@ -1,0 +1,97 @@
+While automatic speech recognition (ASR) technology is increasingly coming into practical use, ASR in noisy environments remains a challenge.
+自動音声認識（ASR）技術はますます実用化されつつありますが、騒音の多い環境でのASRは依然として課題です。
+
+This is difficult because variability and changes in acoustic environments must be handled using corrupted features.
+これは、壊れた機能を使用して音響環境の変動性や変化を処理する必要があるため困難です。
+
+A successful solution to this problem would be reached only by combining both a high quality enhancement front-end and a robust backend recogniser.
+この問題に対する成功した解決方法は、高品質の拡張フロントエンドと堅牢なバックエンド認識装置の両方を組み合わせることによってのみ達成されます。
+
+Top-performing systems in recent challenge programs associated with noise robustness integrate strong front-ends and state-of-the-art back-ends [1, 2, 3].
+ノイズロバスト性に関連する最近のチャレンジプログラムでは、優れたフロントエンドと最先端のバックエンドが統合されています[1,2,3]。
+
+
+The third edition of the CHiME challenge (CHiME-3), which was proposed this year, provides a new framework for evaluating techniques for noise robustness [4].
+今年提案されたCHiMEチャレンジ（CHiME-3）の第3版は、ノイズロバスト性のための技術を評価するための新しい枠組みを提供する[4]
+
+Unlike the previous editions of the challenge, this new edition uses real recordings collected in various noisy environments.
+挑戦の前の版とは異なり、この新版は様々な騒々しい環境で収集された実際の録音を使用します。
+
+In addition, a Kaldi-based [5] baseline script was made available for this new task.
+さらに、Kaldiベースの[5]ベースラインスクリプトがこの新しいタスクに利用可能になりました。
+
+This baseline represents today’s standard, utilising sequence-trained deep neural network (DNN) acoustic models [6].
+このベースラインは、シーケンス訓練された深いニューラルネットワーク（DNN）の音響モデル[6]を利用して、今日の標準を表しています。
+
+These features of CHiME-3 enable the assessment of the practical relevance of noise robustness techniques.
+CHiME-3のこれらの特徴は、ノイズロバストネス技術の実用的な関連性の評価を可能にする。
+
+This paper describes NTT’s submission to CHiME-3, which integrates advanced speech enhancement and recognition techniques.
+本稿では、高度な音声強調と認識技術を統合したCHiME-3へのNTTの提出について述べる。
+
+The novel techniques introduced in this work include the following:
+この研究で紹介された新しい技術には、以下のものが含まれる
+
+・Spectral mask-based minimum variance distortionless response (MVDR) beamformer for noise reduction.
+ノイズ低減のためのスペクトルマスクベースの最小分散歪みレスポンス（MVDR）ビーム形成器。
+
+The proposed scheme exploits spectral masks to obtain accurate estimates of acoustic beam-steering vectors.
+提案方式は、スペクトルマスクを利用して音響ビームステアリングベクトルの正確な推定値を得る。
+
+・Acoustic modelling using a deep convolutional neural network (CNN) based on the “network in network” (NIN) concept.
+"network in network"（NIN）概念に基づく深い畳み込みニューラルネットワーク（CNN）を用いた音響モデリング。
+
+The NIN-CNN was recently proposed to improve image classification performance [7, 8].
+NIN-CNNは最近、画像分類性能を改善するために提案された[7,8]。
+
+In this model, 1×1 convolution layers are interleaved with ordinary convolution layers.
+このモデルでは、1×1の畳み込み層が通常の畳み込み層とインターリーブされる。
+
+Speaker adaptation results for the NIN-CNN acoustic model are also presented.
+NIN-CNN音響モデルのスピーカ適応結果も提示される。
+
+In addition to these improvements, our system makes use of advanced techniques, such as multi-microphone training [9], weighted prediction error-based (WPE) dereverberation [10, 11], one-pass recurrent neural network language model (RNN-LM) decoding [12], and system combination with cross-adaptation [13].
+これらの改良に加えて、我々のシステムはマルチマイクロホントレーニング[9]、重み付け予測誤差ベース（WPE）残響除去[10,11]、ワンパスリカレントニューラルネットワーク言語モデル（RNN-LM）[12]、クロスアダプテーション[13]のような、高度な技術を利用している。
+The performance merits of these techniques are also evaluated.
+これらの技術の性能メリットも評価されます。
+
+The combination of these technical advances allows our submitted system to significantly outperform the official baseline system.
+これらの技術的進歩の組み合わせは、提出されたシステムが公式のベースラインシステムを大幅に上回る性能を発揮することを可能にします。
+
+Our system achieved word error rates (WERs) of 3.45% and 5.83% on the real parts of the development (dev) and evaluation (eval) sets, respectively, while the baseline development and evaluation WERs were 16.13% and 33.43%, respectively.
+我々のシステムは、開発（dev）および評価（評価）の実数部でそれぞれ3.45％および5.83％のワード誤り率（WER）を達成し、ベースライン開発および評価WERはそれぞれ16.13％および33.43％であった。
+
+
+In addition to the submitted system, we developed the following three simpler systems:
+提出されたシステムに加えて、以下の3つのよりシンプルなシステムを開発しました。
+
+・A one-pass speaker independent (SI) system in which every processing step can be performed online.
+すべての処理ステップをオンラインで実行できるワンパススピーカー独立型（SI）システム。
+
+・A multi-pass SI system that performs one-pass SI decoding using features enhanced in a front-end.
+フロントエンドで強化された機能を使用してワンパスSIデコードを実行するマルチパスSIシステム。
+
+Enhancement is performed by processing each utterance multiple times.
+エンハンスメントは、各発話を複数回処理することによって実行される。
+
+・A single-model speaker adapted (SA) system that performs decoding with a model obtained by adapting the SI model used in the multi-pass SI system.
+・マルチパスSIシステムで使用されるSIモデルを適用して得られたモデルでデコードを実行する単一モデルのスピーカー対応（SA）システム。
+
+This system differs from our submitted system because the former does not involve any form of system combination while the latter does.
+このシステムは提出されたシステムとは異なります。なぜなら、前者は後者のシステムコンビネーションの形式を伴わないからです。
+
+These three systems were built to perform evaluations in practically constrained set-ups while our submitted system was built to explore the degree to which we could push down error rates without any constraints except for the challenge regulations described in Section 2.
+これらの3つのシステムは、実際に制約されたセットアップで評価を実行するために構築されましたが、第2章で説明した挑戦規制を除いて、エラーレートを押し下げる程度を調査するために作成されました。
+
+The rest of this paper is organised as follows.
+この論文の残りの部分は次のように構成されています。
+
+Section 2 briefly describes the CHiME-3 task.
+セクション2では、CHiME-3タスクについて簡単に説明します。
+
+Sections 3 and 4 present the backend and front-end techniques that we used.
+セクション3と4は、私たちが使ったバックエンドとフロントエンドのテクニックを示しています。
+
+Section 5 describes our systems and shows the results we obtained when we evaluated them.
+5章では、システムについて説明し、評価した結果を示します。
+

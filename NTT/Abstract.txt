@@ -1,0 +1,24 @@
+CHiME-3 is a research community challenge organised in 2015 to evaluate speech recognition systems for mobile multi-microphone devices used in noisy daily environments.
+
+CHiME-3は、騒々しい日々の環境で使用されるモバイルマルチマイクデバイスの音声認識システムを評価するために2015年に開催された研究コミュニティの課題です。
+
+This paper describes NTT’s CHiME-3 system, which integrates advanced speech enhancement and recognition techniques. 
+本稿では、高度な音声強調技術と認識技術を統合したNTTのCHiME-3システムについて述べる。
+
+Newly developed techniques include the use of spectral masks for acoustic beam-steering vector estimation and acoustic modelling with deep convolutional neural networks based on the “network in network” concept.
+新たに開発された技術には、音響ビームステアリングベクトル推定のためのスペクトルマスクの使用と、ネットワーク内のネットワーク概念に基づく深い畳み込みニューラルネットワークによる音響モデリングが含まれる。
+
+In addition to these improvements, our system has several key differences from thesofficial baseline system.
+これらの改善に加えて、当社のシステムは、公的ベースラインシステムとのいくつかの重要な相違点を有する。
+
+The differences include multi-microphone training, dereverberation, and cross adaptation of neural networks with different architectures.
+その違いには、マルチマイクロホンのトレーニング、残響除去、および異なるアーキテクチャのニューラルネットワークのクロスアダプテーションが含まれます。
+
+The impacts that these techniques have on recognition performance are investigated.
+これらの技法が認識性能に及ぼす影響を調査する。
+
+By combining thesesadvanced techniques, our system achieves a 3.45% development error rate and a 5.83% evaluation error rate.
+これらの高度な技術を組み合わせることで、当社のシステムは3.45％の開発エラー率と5.83％の評価エラー率を達成しました。
+
+Three simpler systems are also developed to perform evaluations with constrained set-ups.
+3つのよりシンプルなシステムも開発され、拘束されたセットアップで評価を実行します。

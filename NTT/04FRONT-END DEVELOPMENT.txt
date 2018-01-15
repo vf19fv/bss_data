@@ -1,0 +1,137 @@
+Our front-end was designed to remove irrelevant feature variations caused by environmental noise without producing processing artefacts.
+私たちのフロントエンドは、処理ノイズを発生させずに、環境ノイズに起因する無関係の特性変動を除去するように設計されています。
+
+To meet this requirement, our front-end performs speech enhancement with linear time-invariant filters as this approach does not suffer from artefacts and thus improves the recognition performance of DNN-based acoustic models [24].
+この要求を満たすために、我々のフロントエンドは、この手法がアーチファクトに悩まされないように、DNNベースの音響モデルの認識性能を改善するため、線形時間不変フィルタを用いて音声強調を行う[24]。
+
+
+As shown in Fig.2, our front-end enhances speech in two steps: WPE-based dereverberation and MVDR beamforming.
+図2に示すように、フロントエンドは、WPEベースの残響除去とMVDRビームフォーミングの2つのステップでスピーチを強化します。
+
+The acoustic beam of the MVDR is controlled using steering vectors estimated based on spectral masks.
+MVDRの音響ビームは、スペクトルマスクに基づいて推定されたステアリングベクトルを使用して制御される。
+
+Since these techniques process individual utterances with a batch operation approach, enhancement was performed only for multi-pass systems.
+これらの技法は、バッチ操作アプローチを用いて個々の発声を処理するので、マルチパスシステムに対してのみ強化が行われた。
+
+
+4.1.Weighted prediction error-based dereverberation
+重み付き予測誤差ベースの残響除去
+
+The dereverberation technique used in this work, i.e., the WPE method, converts six-channel input audio into six-channel, less reverberant signals.
+この作品で使用されている残響除去技術、すなわちWPE法は、6チャンネルの入力オーディオを6チャンネルの反響の少ない信号に変換します。
+
+An important feature of this method is that, unlike approaches based on spectral subtraction [25, 26], dereverberation is carried out with a linear time-invariant filter and thus introduces little artefact.
+この方法の重要な特徴は、スペクトル減算[25,26]に基づくアプローチとは異なり、残響除去は線形時間不変フィルタを用いて実行されるため、アーチファクトはほとんど導入されないことである。
+
+WPE was previously applied to meeting transcription and distant speech recognition tasks [27, 2], where speech signals were contaminated by reverberation and a modest level of additive noise.
+WPEは、音声信号が残響と控えめなレベルの付加雑音によって汚染された、転写および遠隔音声認識タスク[27、2]を満たすために以前に適用されていました。
+
+A detailed description of the method can be found in [10, 28].
+この方法の詳細な説明は、[10、28]に記載されています。
+
+The experimental results shown in Table 4 clearly reveal the benefit of dereverberation.
+表4に示す実験結果は、残響除去の利点を明らかに示している。
+
+WPE yielded a performance gain of 7.54% relative for the real part of the development set.
+WPEは、開発セットの実際の部分に対して相対的に7.54％のパフォーマンス向上をもたらしました。
+
+As expected, it was particularly effective for utterances collected on buses, i.e., small enclosed spaces, and improved the recognition performance by 8.57% relative.
+予想通り、バス上に集められた発話、すなわち密閉空間が小さく、認識性能が8.57％向上した。
+
+This provides evidence that this method works for environments with strong additive noise.
+これは、この方法が強い加法性ノイズを伴う環境で機能するという証拠を提供する。
+
+Note that little improvement was obtained for the simulated data because reverberation was not considered in the simulation.
+シミュレーションでは残響が考慮されていないため、シミュレーションデータはほとんど改善されていないことに注意してください。
+4.2.Spectral mask-based steering vector estimation
+スペクトルマスクベースのステアリングベクトル推定
+
+MVDR is a technique for forming an acoustic beam to pick up signals arriving from a direction specified by a steering vector, thereby removing background noise.
+MVDRは、ステアリングベクトルによって指定された方向から到来する信号を捕捉するために音響ビームを形成し、それによりバックグラウンドノイズを除去する技術である。
+
+Accurate estimation of the steering vector is paramount for successful noise reduction.
+ノイズ低減を成功させるためには、ステアリングベクトルの正確な推定が重要です。
+
+To this end, we introduce spectral mask-based steering vector estimation as described below.
+この目的のために、以下で説明するように、スペクトルマスクベースのステアリングベクトル推定を導入する。
+
+
+The key difference between the conventional and spectral maskbased beamformer designs is that while the former often obtains steering vectors from the estimated speaker direction and the microphone array geometry, which are not always accurate, the latter does not rely on such unreliable prior information.
+従来のスペクトルベースのビームフォーマ設計とスペクトルベースのビームフォーマ設計との間の主な違いは、前者が推定スピーカ方向および常に正確ではないマイクロホンアレイ形状からステアリングベクトルを取得することが多いが、後者は信頼性の低い先行情報に依存しないことである。
+
+The basic idea is to obtain a steering vector by computing the principal eigenvector of an estimate of the spatial correlation matrix, RX f , of clean speech signals, where f denotes a frequency bin index.
+基本的な考えは、クリーン音声信号の空間相関行列RX fの推定の主固有ベクトルを計算することによってステアリングベクトルを得ることである。ここで、fは周波数ビン指数を表す。
+
+Assuming the statistical independence of speech and noise, the required spatial correlation matrix can be estimated as
+
+式(3)
+
+where RX+Nf and RNf are the spatial correlation matrices of noisy speech and noise, respectively.
+音声と雑音の統計的独立性を仮定すると、必要な空間相関行列は、式(3)として推定することができる。ここで、R^(X+N)_fおよびR^N_fは、それぞれ、雑音のある音声および雑音の空間相関行列である。
+
+They can be estimated by using spectral mask Mf,t as follows [29]:
+それらは、以下のようにスペクトルマスクMf、tを用いることによって推定することができる[29]。
+式(4)
+
+where yf,t is a vector comprising input STFT coefficients at frequency f and time t and T is the number of frames constituting an utterance.
+ここで、yf、tは、周波数fおよび時間tにおける入力STFT係数を含むベクトルであり、Tは、発声を構成するフレームの数である。
+
+Spectral mask Mf,t satisfies 0≦Mf,t ≦ 1, where Mf,t = 1 indicates that the corresponding time-frequency bin contains speech.
+スペクトルマスクMf、tは、0≦Mft≦1を満たす。ここで、Mft = 1は、対応する時間 - 周波数ビンがスピーチを含むことを示す。
+
+
+The key to the success of the proposed approach is the unsupervised and accurate estimation of spectral masks.
+提案された手法の成功の鍵は、スペクトルマスクの監督されていない正確な推定である。
+
+Many spectral mask estimation schemes have been proposed by the speech separation community, including those based on GMMs [30, 31], Watson mixture models (WMMs) [32, 33] and complex GMMs (CGMMs) 1 [34].
+GMMs [30,31]、Watson混合モデル（WMMs）[32,33]、複雑なGMMs（CGMMs）[34]に基づくものを含む、音声分離コミュニティによって多くのスペクトルマスク推定スキームが提案されている。
+
+On the basis of preliminary experiments conducted in the initial stage of our development, we decided to use the CGMM scheme, which can be explained as follows.
+開発の初期段階で行った予備実験に基づき、以下のように説明することができるCGMM方式を採用することにしました。
+
+Each time-frequency bin is assumed either to be dominated by noise or to contain both speech and noise.
+各時間 - 周波数ビンは、ノイズによって支配されるか、またはスピーチとノイズの両方を含むと仮定される。
+
+This assumption allows individual time-frequency bins to be clustered into two classes: a speech-plus-noise class and a noise class.
+Clustering is performed by modelling multi-channel STFT coefficient vectors with a CGMM with two components: one corresponds to speech-plus-noise, and one to noise.
+この仮定により、個々の時間 - 周波数ビンを2つのクラス、すなわちスピーチプラスノイズクラスおよびノイズクラスにクラスタリングすることが可能になる。
+
+Then, the spectral mask for each time-frequency bin can be obtained as the posterior probability of that bin being judged to be speech-plus-noise.
+そして、時間 - 周波数ビンごとのスペクトルマスクは、そのビンの音声 - 雑音であると判断される事後確率として得られる。
+
+
+The benefit of this “blind” steering vector estimation approach can be clearly seen in Table 5, where we compare the challenge baseline beamformer and our beamformer.
+この「ブラインド」ステアリングベクトル推定アプローチの利点は、表5で明らかになります。表5では、チャレンジベースラインビームフォーマとビームフォーマを比較しています。
+
+The baseline beamformer improved the recognition performance only for the simulated subset, in which the data characteristics match an assumed room acoustics model.
+ベースラインビーム形成器は、データ特性が仮定された室内音響モデルと一致するシミュレーションサブセットについてのみ認識性能を改善した。
+
+By contrast, the proposed beamformer yielded large gains for both the simulated and real data.
+対照的に、提案されたビーム形成器は、シミュレートされたデータと実際のデータの両方に対して大きな利得をもたらした。
+
+
+Finally, we further performed experiments to confirm the effectiveness of using MVDR rather than directly applying estimated spectral masks.
+最後に、推定スペクトルマスクを直接適用するのではなく、MVDRを使用することの有効性を確認するための実験をさらに実施しました。
+
+The motivation behind this experiment is that spectral masks have usually been applied directly to input STFT coefficients in previous studies concerning speech separation except for a few papers [29, 33].
+この実験の背後にある動機は、いくつかの論文を除いてスピーチ分離に関する以前の研究では、通常、スペクトルマスクが入力STFT係数に直接適用されているということである[29,33]。
+
+Table 6 contrasts the performance of MVDR beamforming with that of spectral masking.
+表6は、MVDRビームフォーミングの性能とスペクトルマスキングの性能とを対比している。
+
+The result shows a significant performance difference between these two approaches.
+結果は、これらの2つのアプローチの間に重要なパフォーマンスの違いを示しています。
+
+The serious performance degradation caused by spectral masking means that acoustic models are prone to artefacts produced by spectral masking.
+スペクトルマスキングによって引き起こされる重大な性能低下は、音響モデルがスペクトルマスキングによって生成されるアーチファクトになり易いことを意味する。
+
+Since MVDR uses a linear time-invariant filter to obtain enhanced speech, it tends to generate few artefacts.
+MVDRは、拡張スピーチを得るために線形時間不変フィルタを使用するため、アーチファクトはほとんど発生しません。
+
+
+This result and our previous experience [29, 2, 24] combined to allow us to conclude that speech enhancement with linear timeinvariant filters can effectively reduce recognition errors made by state-of-the-art acoustic models based on DNNs.
+この結果と我々の以前の経験[29,2,24]は、DNNに基づく最先端の音響モデルによる認識誤りを効果的に低減することができると結論付けた。
+
+Further results on the proposed CGMM-based scheme will be reported in a separate paper [35].
+提案されたCGMMベースのスキームに関するさらなる結果は、別紙[35]に報告される。

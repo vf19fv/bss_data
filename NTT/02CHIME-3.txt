@@ -1,0 +1,47 @@
+The CHiME-3 corpus consists of real six-channel audio data collected in four different environments and additional simulated six- channel data.
+CHiME-3コーパスは、4つの異なる環境で収集された実際の6チャネルオーディオデータと、追加のシミュレートされた6チャネルデータで構成されています。
+
+A tablet device with six microphones was used for audio recording to simulate a situation where a user is talking to the device in daily environments.
+6つのマイクを備えたタブレットデバイスを使用して、ユーザーが毎日の環境でデバイスと会話している状況をシミュレートしました。
+
+The considered environments are: caf´e (CAF), street junction (STR), public transport (BUS), and pedestrian area (PED).考えられる環境は、カフェ（CAF）、ストリートジャンクション（STR）、公共交通機関（BUS）、歩行者エリア（PED）です。
+
+The corpus includes only read speech, where the sentences to be read were taken from the WSJ0 corpus.
+コーパスには読み上げ音声のみが含まれ、読み上げる文章はWSJ0コーパスから取得されます。
+
+
+The training set comprises 1600 real and 7138 simulated utterances, which amount to 18 hours of speech.
+訓練セットは、16時間の実話と7138のシミュレートされた発話を含み、これは18時間の発話に相当する。
+
+The development and evaluation sets consist of 3280 and 2640 utterances, respectively, each containing 50% real and 50% simulated data.
+開発と評価のセットは、それぞれ3280と2640の発話から成り、それぞれには50％の実データと50％のシミュレートされたデータが含まれています。
+
+Both the real and simulated parts were spoken by four different speakers.
+実際の部分とシミュレートされた部分は、4人の異なるスピーカーによって話されました。
+
+A set of regulations were suggested to allow scientific conclusions to be drawn from a comparison of systems developed at different sites.
+異なるサイトで開発されたシステムの比較から科学的結論を引き出すための一連の規制が提案された。
+
+The regulations include the following:
+規制には以下が含まれます：
+
+・Acoustic models must be trained based on the provided training data set.
+音響モデルは、提供された訓練データセットに基づいて訓練されなければならない。
+
+・Language models must be trained solely on the official language model training data.
+言語モデルは、公式言語モデルのトレーニングデータだけで訓練されていなければなりません。
+
+・Environment labels may not be used for decoding.
+環境ラベルはデコードに使用できません。
+
+・Utterance segmentations may not be changed in ways other than extending each segment to the past by up to 5 seconds.
+発話セグメンテーションは、各セグメントを過去5秒まで延長する以外の方法で変更することはできません。
+
+・Systems must be tuned by using the development set.
+システムは、開発セットを使用して調整する必要があります。
+
+Our investigations were conducted within the scope bounded by these regulations.
+当社の調査は、これらの規制の範囲内で実施された。
+
+Details of the data sets and regulations can be found in [4].
+データセットと規制の詳細は、[4]。

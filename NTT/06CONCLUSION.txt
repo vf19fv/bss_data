@@ -1,0 +1,8 @@
+This paper described the speech recognition system for multimicrophone mobile devices developed at NTT for the CHiME-3 challenge and key techniques used in the system.
+本稿では、NTTで開発したマルチマイクロホンの音声認識システムについて、CHiME-3の課題とそのシステムで用いられる重要な技術について述べた。
+
+Our novel techniques include MVDR beamforming with accurate steering vector estimation based on spectral masks and acoustic modelling based on the NIN-CNN concept.
+我々の新しい手法には、スペクトルマスクに基づく正確なステアリングベクトル推定とNIN-CNNの概念に基づく音響モデリングによるMVDRビームフォーミングが含まれます。
+
+In addition, our system differs from the official baseline system in many respects, namely multi-microphone training, the use of an RNN language model, dereverberation with the WPE method, and system combination with cross adaptation, all of which were shown to yield significant performance gains.
+加えて、我々のシステムは、多くの点で、マルチマイクトレーニング、RNN言語モデルの使用、WPE法による残響除去、クロスアダプテーションによるシステムコンビネーションなどの公式のベースラインシステムとは大きく異なります。
